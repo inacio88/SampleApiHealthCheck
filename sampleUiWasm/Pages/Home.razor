@@ -1,0 +1,25 @@
+﻿@page "/"
+@inject HttpClient http
+
+<PageTitle>Cursos</PageTitle>
+
+<h1>Todos os cursos!</h1>
+
+@if (courses is not null)
+{
+    foreach(var c in courses)
+    {
+        <a href="@c.CourseUrl">
+            <img width="300" src="@c.CourseImage" />
+        </a>
+    }
+}
+
+@code {
+    private List<CourseModel>? courses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        courses = await http.GetFromJsonAsync<List<CourseModel>>("http://localhost:5263/courses");
+    }
+}
