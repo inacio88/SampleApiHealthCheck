@@ -6,12 +6,22 @@ namespace apiWithHealthChecksAndScalar.Endpoints
     {
         public static void AddCourseEndpoints(this WebApplication app)
         {
-            app.MapGet("/courses", LoadAllCourses);
-            app.MapGet("/courses/{id}", LoadCourseById);
+            app.MapGet("/courses", LoadAllCoursesAsync);
+            app.MapGet("/courses/{id}", LoadCourseByIdAsync);
         }
 
-        private static IResult LoadCourseById(CourseData data, int id)
+        private static async Task<IResult> LoadCourseByIdAsync(CourseData data, int id, int? delay)
         {
+
+            if (delay is not null)
+            {
+                if(delay > 300_000)
+                {
+                    delay = 300_000;
+                }
+                await Task.Delay((int)delay);
+            }
+
             var output = data.Courses.SingleOrDefault(x => x.Id == id);
             if (output is null)
             {
@@ -20,7 +30,7 @@ namespace apiWithHealthChecksAndScalar.Endpoints
             return Results.Ok(output);
         }
 
-        private static IResult LoadAllCourses(CourseData data, string? courseType, string? search)
+        private static async Task<IResult> LoadAllCoursesAsync(CourseData data, string? courseType, string? search, int? delay)
         {
             var output = data.Courses;
 
@@ -34,6 +44,15 @@ namespace apiWithHealthChecksAndScalar.Endpoints
                                       &&
                                       !x.ShortDescription.Contains(search, StringComparison.OrdinalIgnoreCase)
                                 );
+            }
+
+            if (delay is not null)
+            {
+                if(delay > 300_000)
+                {
+                    delay = 300_000;
+                }
+                await Task.Delay((int)delay);
             }
 
             return Results.Ok(output);
